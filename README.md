@@ -41,6 +41,5 @@ grprob = TightBindingProblem(gr2hops, [
 sol = solve(grprob)
 
 # Plot the band diagram.
-
 plotSolution(sol)
 ```
