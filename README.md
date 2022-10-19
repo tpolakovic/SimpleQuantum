@@ -30,7 +30,7 @@ for hop ∈ SimpleQuantum.unique_neighbors(graphene)
 end
 
 # Assemble the tight binding problem.
-grprob = TightBindingProblem(gr2hops, [
+grprob = TightBindingProblem(grhops, [
     :K => [1/3,1/3],
     :Γ => [0,0],
     :M => [1/2,0],
