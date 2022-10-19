@@ -45,3 +45,5 @@ sol = solve(grprob)
 # Plot the band diagram.
 plotSolution(sol)
 ```
+
+<img src="https://user-images.githubusercontent.com/9288586/196821411-d52fd1a1-5ca1-487a-8295-637948a6b750.png" width=50% height=50%>
