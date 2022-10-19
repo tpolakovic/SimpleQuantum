@@ -6,7 +6,7 @@ A Julia package for calculating properties of crystalline solids. Currently supp
 
 In Julia REPL, press `]` to enter pkg mode and enter:
 
-``` julia
+```
 pkg> add https://github.com/tpolakovic/SimpleQuantum
 ```
 ## Sample
