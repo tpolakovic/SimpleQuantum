@@ -16,6 +16,7 @@ pkg> add https://github.com/tpolakovic/SimpleQuantum
 To calculate the two-band graphene structure:
 
 ``` julia
+using SimpleQuantum
 
 # Define the graphene crystal.
 graphene = Crystal(
@@ -45,5 +46,6 @@ sol = solve(grprob)
 # Plot the band diagram.
 plotSolution(sol)
 ```
+Output:
 
 <img src="https://user-images.githubusercontent.com/9288586/196821411-d52fd1a1-5ca1-487a-8295-637948a6b750.png" width=50% height=50%>
