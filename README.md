@@ -57,9 +57,10 @@ using SimpleQuantum
 using LinearAlgebra
 using GLMakie
 
+# Define the aluminum crystal structure.
 Al = Crystal(
-    Lattice(2.856Å,2.856Å,2.856Å,60,60,60),
-    UnitCell(:Al, [0.0,0.0,0.0])
+    Lattice(2.856Å, 2.856Å, 2.856Å, 60, 60, 60),
+    UnitCell(:Al, [0.0, 0.0, 0.0])
 )
 
 # Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 3.
