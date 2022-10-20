@@ -13,7 +13,7 @@ pkg> add https://github.com/tpolakovic/SimpleQuantum
 ```
 ## Sample
 
-### Tight binding model two-band graphene:
+### Tight binding model of two-band graphene:
 
 ``` julia
 using SimpleQuantum
