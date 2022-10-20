@@ -11,6 +11,7 @@ using GLMakie
 include("crystal.jl")
 include("interface.jl")
 include("tb.jl")
+include("nfe.jl")
 include("misc.jl")
 
 # Unit definitons
@@ -34,6 +35,7 @@ export a₀,
     addhop!,
     addonsite!,
     addoverlap!,
-    TightBindingProblem
+    TightBindingProblem,
+    NearlyFreeElectronProblem
 
 end
