@@ -41,7 +41,7 @@ Solves an assembled problem defined by constructors with name `<Model Name>Probl
 """
 function solve(p)
     t = typeof(p)
-    ArgumentError("$t has no solution implemented.")
+    throw(ArgumentError("$t has no solution implemented."))
 end
 
 function plotSolution(s::Solution)
