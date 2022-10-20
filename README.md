@@ -65,7 +65,7 @@ Al = Crystal(
 # Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 3.
 V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
 
-# Use reciprocal vector of magnitude up to 2 recuded momentum units.
+# Use reciprocal vectors of magnitude up to 2 reduced momentum units.
 alprob = NearlyFreeElectronProblem(2, V, Al, [
     :Γ => [0,0,0],
     :X => [1/2,0,1/2],
