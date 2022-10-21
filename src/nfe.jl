@@ -25,11 +25,25 @@ struct NearlyFreeElectronProblem
     kl::Vector{Pair{Symbol, <:Real}}
 end
 
+"""
+     NearlyFreeElectronProblem(n::Integer, V::Function, c::Crystal, kpositions::Vector, kstep::Real)
+
+Assembles the nearly free electron model.
+
+The Hamiltonian is determined from the potential as a function of momentum `V` := V(k) with reciprocal lattice components from up to `n`-th Brillouin zone.
+"""
 function NearlyFreeElectronProblem(n::Integer, V::F, c::Crystal, kpositions::Vector, kstep::Real) where F <: Function
     k = kpath(kpositions, kstep)
     NearlyFreeElectronProblem(V, n, c, k.path, k.plength, k.ppoints)
 end
 
+"""
+     NearlyFreeElectronProblem(V::Matrix, c::Crystal, kpositions::Vector, kstep::Real)
+
+Assembles the nearly free electron model.
+
+The potential terms of the Hamiltoniain are stored in the matrix `V`.
+"""
 function NearlyFreeElectronProblem(V::Matrix, c::Crystal, kpositions::Vector, kstep::Real)
     k = kpath(kpositions, kstep)
     (n1, n2) = size(V)
