@@ -26,7 +26,7 @@ export a₀,
     Lattice,
     UnitCell,
     Crystal,
-    plotcrystal!
+    plotcrystal!,
     evals,
     evecs,
     kvecs,
