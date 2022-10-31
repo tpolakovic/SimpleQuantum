@@ -105,7 +105,7 @@ end
 grH = TightBindingHamiltonian(grhops)
 
 # Define the momentum path.
-kpath = SimpleQuantum.ReciprocalPath([
+kpath = ReciprocalPath([
            :K => [1/3,1/3],
            :Γ => [0,0],
            :M => [1/2,0],

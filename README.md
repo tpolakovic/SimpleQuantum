@@ -36,7 +36,7 @@ end
 grH = TightBindingHamiltonian(grhops)
 
 # Define the momentum path.
-kpath = SimpleQuantum.ReciprocalPath([
+kpath = ReciprocalPath([
            :K => [1/3,1/3],
            :Γ => [0,0],
            :M => [1/2,0],
@@ -69,7 +69,7 @@ V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
 # Define the Hamiltonian using the pseudopotential above with reciprocal lattice vectors from up to the 2nd shell
 alH = PseudoPotentialHamiltonian(2, V, Al)
 
-kpath = SimpleQuantum.ReciprocalPath([
+kpath = ReciprocalPath([
     :Γ => [0,0,0],
     :X => [1/2,0,1/2],
     :W => [1/2,1/4,3/4],

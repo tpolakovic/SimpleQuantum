@@ -13,7 +13,7 @@ V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
 
 alH = PseudoPotentialHamiltonian(2, V, Al)
 
-kpath = SimpleQuantum.ReciprocalPath([
+kpath = ReciprocalPath([
     :Γ => [0,0,0],
     :X => [1/2,0,1/2],
     :W => [1/2,1/4,3/4],
