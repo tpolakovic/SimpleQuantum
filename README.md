@@ -50,7 +50,7 @@ Output:
 
 <img src="https://user-images.githubusercontent.com/9288586/196821411-d52fd1a1-5ca1-487a-8295-637948a6b750.png" width=50%>
 
-### Nearly free electron model of aluminum
+### Nearly free electron model of aluminum:
 
 ``` julia
 using SimpleQuantum
@@ -66,6 +66,7 @@ Al = Crystal(
 # Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 3.
 V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
 
+# Define the Hamiltonian using the pseudopotential above with reciprocal lattice vectors from up to the 2nd shell
 alH = PseudoPotentialHamiltonian(2, V, Al)
 
 kpath = SimpleQuantum.ReciprocalPath([
