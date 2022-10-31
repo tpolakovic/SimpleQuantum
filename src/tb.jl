@@ -79,11 +79,6 @@ function addoverlap!(hops, S, i, j, δ)
     hops
 end
 
-"""
-    tbH(k, hops::Hoppings)
-
-Returns a tuple `(H, S)` where `H` is the tight binding Hamiltonian matrix and `S` the overlap matrix at given momentum `k`.
-"""
 function tbH(k, hops::Hoppings)
     n = hops.maxij
     ham = zeros(Complex,n,n)
@@ -114,36 +109,17 @@ function tbH(k, hops::Hoppings)
 end
 
 # interface
-struct TightBindingProblem
+"""
+    TightBindingProblem(hops::Hoppings)
+
+Tight binding problem definition.
+
+Can be callend on a vector in k-space to output the Hamiltonian.
+"""
+struct TightBindingHamiltonian <: ReciprocalHamiltonian
     hops::Hoppings
-    ks::Vector{Union{<:Real, Vector{<:Real}}}
-    kp::Vector{<:Real}
-    kl::Vector{Pair{Symbol, <:Real}}
 end
 
-"""
-    TightBindingProblem(hops::Hoppings, kpositions::Vector, kstep::Real)
-
-Assembles a tight binding problem that can be solved by the `solve` routine.
-
-# Arguments
-- `hops::Hoppings`: A hopping list.
-- `kpositions::Vector{Pair(Symbol, T)}`: List of k-space branch vertices.
-- `kstep::Real`: Step size along the k-space trajectory.
-"""
-function TightBindingProblem(hops::Hoppings, kpositions::Vector, kstep::Real)
-    k = kpath(kpositions, kstep)
-    TightBindingProblem(hops, k.path, k.plength, k.ppoints)
-end
-
-function solve(p::TightBindingProblem)::Solution
-    h(k) = tbH(k, p.hops)
-    sols = h.(p.ks) .|> x->eigen(x...)
-    Solution(
-        p.ks,
-        p.kp,
-        p.kl,
-        [eig.values for eig ∈ sols],
-        [mapslices(v->v./norm(v), eig.vectors, dims=1) for eig ∈ sols]
-    )
+function (p::TightBindingHamiltonian)(k)
+    tbH(k, p.hops)
 end

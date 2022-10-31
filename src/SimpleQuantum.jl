@@ -36,7 +36,7 @@ export a₀,
     addhop!,
     addonsite!,
     addoverlap!,
-    TightBindingProblem,
-    NearlyFreeElectronProblem
+    TightBindingHamiltonian,
+    PseudoPotentialHamiltonian
 
 end

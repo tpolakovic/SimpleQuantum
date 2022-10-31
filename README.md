@@ -32,19 +32,19 @@ for hop ∈ SimpleQuantum.unique_neighbors(graphene)
     addhop!(grhops, -1.0Ha, hop.i, hop.j, hop.δ)
 end
 
-# Assemble the tight binding problem.
-grprob = TightBindingProblem(grhops, [
-    :K => [1/3,1/3],
-    :Γ => [0,0],
-    :M => [1/2,0],
-    :K => [1/3,1/3]
-], 0.005)
+# Define the tight binding Hamiltonian
+grH = TightBindingHamiltonian(grhops)
 
-# Solve the problem.
-sol = solve(grprob)
+# Define the momentum path.
+kpath = SimpleQuantum.ReciprocalPath([
+           :K => [1/3,1/3],
+           :Γ => [0,0],
+           :M => [1/2,0],
+           :K => [1/3,1/3]
+       ], 0.005)
 
-# Plot the band diagram.
-plotSolution(sol)
+# Solve and plot the problem.
+grH |> kpath |> solve |> plotSolution
 ```
 Output:
 
