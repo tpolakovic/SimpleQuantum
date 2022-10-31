@@ -32,25 +32,25 @@ for hop ∈ SimpleQuantum.unique_neighbors(graphene)
     addhop!(grhops, -1.0Ha, hop.i, hop.j, hop.δ)
 end
 
-# Assemble the tight binding problem.
-grprob = TightBindingProblem(grhops, [
-    :K => [1/3,1/3],
-    :Γ => [0,0],
-    :M => [1/2,0],
-    :K => [1/3,1/3]
-], 0.005)
+# Define the tight binding Hamiltonian
+grH = TightBindingHamiltonian(grhops)
 
-# Solve the problem.
-sol = solve(grprob)
+# Define the momentum path.
+kpath = ReciprocalPath([
+           :K => [1/3,1/3],
+           :Γ => [0,0],
+           :M => [1/2,0],
+           :K => [1/3,1/3]
+       ], 0.005)
 
-# Plot the band diagram.
-plotSolution(sol)
+# Solve and plot the problem.
+grH |> kpath |> solve |> plotSolution
 ```
 Output:
 
 <img src="https://user-images.githubusercontent.com/9288586/196821411-d52fd1a1-5ca1-487a-8295-637948a6b750.png" width=50%>
 
-### Nearly free electron model of aluminum
+### Nearly free electron model of aluminum:
 
 ``` julia
 using SimpleQuantum
@@ -66,8 +66,10 @@ Al = Crystal(
 # Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 3.
 V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
 
-# Use reciprocal vectors of magnitude up to 2 reduced momentum units.
-alprob = NearlyFreeElectronProblem(2, V, Al, [
+# Define the Hamiltonian using the pseudopotential above with reciprocal lattice vectors from up to the 2nd shell
+alH = PseudoPotentialHamiltonian(2, V, Al)
+
+kpath = ReciprocalPath([
     :Γ => [0,0,0],
     :X => [1/2,0,1/2],
     :W => [1/2,1/4,3/4],
@@ -80,11 +82,9 @@ alprob = NearlyFreeElectronProblem(2, V, Al, [
     :K => [3/8,3/8,3/4]
 ], 0.01)
 
-sol = solve(alprob)
+alH |> kpath |> solve |> plotSolution
 
-plotSolution(sol)
 ylims!(current_axis(), (0,10))
-       
 ```
 
 output:

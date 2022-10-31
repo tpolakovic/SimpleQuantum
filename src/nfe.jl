@@ -8,7 +8,6 @@ function nfH(k, n::Integer, V::Function, crystal::Crystal)
 end
 
 function nfH(k, n::Integer, V::Matrix, crystal::Crystal)
-    #(n, _) = size(V)
     G = crystal.lattice.G
     e = sort(Iterators.product(fill(-n:n,length(k))...) |> collect |> vec, by=norm) |> collect
     k = G' * k
@@ -16,52 +15,44 @@ function nfH(k, n::Integer, V::Matrix, crystal::Crystal)
     V .+ diagm((1/2*norm(k .+ g)^2 for g ∈ Gs) |> collect)
 end
 
-struct NearlyFreeElectronProblem
+struct PseudoPotentialHamiltonian <: ReciprocalHamiltonian
     pot
     n::Integer
     c::Crystal
-    ks::Vector{Union{<:Real, Vector{<:Real}}}
-    kp::Vector{<:Real}
-    kl::Vector{Pair{Symbol, <:Real}}
 end
 
 """
-     NearlyFreeElectronProblem(n::Integer, V::Function, c::Crystal, kpositions::Vector, kstep::Real)
+     PsuedoPotentialHamiltonian(n::Integer, V::Function, c::Crystal)
 
-Assembles the nearly free electron model.
+Assembles the pseudopotential Hamiltonian.
 
-The Hamiltonian is determined from the potential as a function of momentum `V` := V(k) with reciprocal lattice components from up to `n`-th Brillouin zone.
+The Hamiltonian is determined from the potential as a function of momentum `V` := V(k) with reciprocal lattice vectors from up to `n`-th shell Brillouin zone.
+
+Can be callend on a vector in k-space to output the Hamiltonian.
 """
-function NearlyFreeElectronProblem(n::Integer, V::F, c::Crystal, kpositions::Vector, kstep::Real) where F <: Function
-    k = kpath(kpositions, kstep)
-    NearlyFreeElectronProblem(V, n, c, k.path, k.plength, k.ppoints)
+function PseudoPotentialHamiltonian(n::Integer, V::F, c::Crystal) where F <: Function
+    PseudoPotentialHamiltonian(V, n, c)
 end
 
 """
-     NearlyFreeElectronProblem(V::Matrix, c::Crystal, kpositions::Vector, kstep::Real)
+     PsuedoPotentialHamiltonian(V::Matrix, c::Crystal)
 
-Assembles the nearly free electron model.
+Assembles the pseudopotential Hamiltonian.
 
 The potential terms of the Hamiltoniain are stored in the matrix `V`.
+
+Can be callend on a vector in k-space to output the Hamiltonian.
 """
-function NearlyFreeElectronProblem(V::Matrix, c::Crystal, kpositions::Vector, kstep::Real)
+function PseudoPotentialHamiltonian(V::Matrix, c::Crystal)
     k = kpath(kpositions, kstep)
     (n1, n2) = size(V)
     if n1 != n2
         throw(ArgumentError("Pontential matrix is not square."))
     end
     n = n1
-    NearlyFreeElectronProblem(V, n, c, k.path, k.plength, k.ppoints)
+    PseudoPotentialHamiltonian(V, n, c)
 end
 
-function solve(p::NearlyFreeElectronProblem)::Solution
-    h(k) = nfH(k, p.n, p.pot, p.c)
-    sols = h.(p.ks) .|> eigen
-    Solution(
-        p.ks,
-        p.kp,
-        p.kl,
-        [eig.values for eig ∈ sols],
-        [mapslices(v->v./norm(v), eig.vectors, dims=1) for eig ∈ sols]
-    )
+function (h::PseudoPotentialHamiltonian)(k::Vector)
+    nfH(k, h.n, h.pot, h.c)
 end

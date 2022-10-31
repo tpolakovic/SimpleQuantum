@@ -31,12 +31,13 @@ export a₀,
     evecs,
     kvecs,
     solve,
+    ReciprocalPath,
     plotSolution,
     Hoppings,
     addhop!,
     addonsite!,
     addoverlap!,
-    TightBindingProblem,
-    NearlyFreeElectronProblem
+    TightBindingHamiltonian,
+    PseudoPotentialHamiltonian
 
 end

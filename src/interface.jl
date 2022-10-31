@@ -1,9 +1,47 @@
-"""
-    Solution
+struct ReciprocalPath
+    ks::Vector{Union{<:Real, Vector{<:Real}}}
+    kp::Vector{<:Real}
+    kl::Vector{Pair{Symbol, <:Real}}
+end
 
-Type containing data of the electronic structure calculation.
+abstract type ReciprocalHamiltonian end
+
+struct ReciprocalBandProblem
+    h::ReciprocalHamiltonian
+    kp::ReciprocalPath
+end
+
+function ReciprocalPath(kpositions::Vector, kstep::Real)
+    k = kpath(kpositions, kstep)
+    ReciprocalPath(k.path, k.plength, k.ppoints)
+end
+
+function (rp::ReciprocalPath)(h::ReciprocalHamiltonian)
+    ReciprocalBandProblem(h, rp)
+end
+
+abstract type Solution end
+
 """
-struct Solution
+    evals(s::Solution)
+
+Returns an array of eigenvalues of solution `s`.
+"""
+evals(s::Solution) = s.es
+
+"""
+    evecs(s::Solution)
+
+Returns an array of eigenvectors of solution `s`.
+"""
+evecs(s::Solution) = s.evs
+
+"""
+    BandSolution
+
+Type containing data of the electronic band structure calculation.
+"""
+struct BandSolution <: Solution
     ks::Vector{Union{<:Real, Vector{<:Real}}}
     kp::Vector{<:Real}
     kl::Vector{Pair{Symbol, <:Real}}
@@ -12,39 +50,42 @@ struct Solution
 end
 
 """
-    evals(s::Solution)
-
-Returns an array of eigenvalues along the k-path.
-
-The n-th element of the array contains an array of eigenvalues corresponding to n-th k-position returned by `kvecs`.
-"""
-evals(s::Solution) = s.es
-"""
-    evecs(s::Solution)
-
-Returns an array of eigenvectors along the k-path.
-
-Each element or the returned array is a matrix with eigenvectors as columns. n-th matrix corresponds to n-th k-position returned by `kvecs`.
-"""
-evecs(s::Solution) = s.evs
-"""
-    kvecs(s::Solution)
+    kvecs(s::BandSolution)
 
 Returns the points along the k-space trajectory along which the solution was calculated.
 """
-kvecs(s::Solution) = s.ks
+kvecs(s::BandSolution) = s.ks
 
 """
-    solve(p)
+    solve(rbp::ReciprocalBandProblem)
 
-Solves an assembled problem defined by constructors with name `<Model Name>Problem`.
+Calculates the electronic bands of `rbp`.
 """
-function solve(p)
-    t = typeof(p)
-    throw(ArgumentError("$t has no solution implemented."))
+function solve(rbp::ReciprocalBandProblem)
+    kbranch = rbp.kp
+    hs = rbp.h.(kbranch.ks)
+    if typeof(first(hs)) <: Tuple
+        sols = hs .|> x -> eigen(x...)
+    else
+        sols = hs .|> eigen
+    end
+    BandSolution(
+        kbranch.ks,
+        kbranch.kp,
+        kbranch.kl,
+        [eig.values for eig ∈ sols],
+        [mapslices(v -> v ./ norm(v), eig.vectors, dims = 1) for eig ∈ sols]
+    )
 end
 
-function plotSolution(s::Solution)
+"""
+    plotSolution(s::BandSolution)
+
+Plots the band diagram of `s`.
+
+The returned object is a figure that can be further modified if needed.
+"""
+function plotSolution(s::BandSolution)
     fig = Figure()
     ax = Axis(fig)
     ax.xticks = ([p.second for p ∈ s.kl],
