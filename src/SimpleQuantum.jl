@@ -7,6 +7,7 @@ using RangeHelpers: range, around
 using Match
 using Colors
 using GLMakie
+using Accessors
 
 include("crystal.jl")
 include("interface.jl")
@@ -27,17 +28,19 @@ export a₀,
     UnitCell,
     Crystal,
     plotcrystal!,
+    fermilevel,
+    shiftenergy,
     evals,
     evecs,
     kvecs,
     solve,
     ReciprocalPath,
     plotSolution,
+    DOS,
     Hoppings,
     addhop!,
     addonsite!,
     addoverlap!,
     TightBindingHamiltonian,
     PseudoPotentialHamiltonian
-
 end

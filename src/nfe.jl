@@ -56,3 +56,7 @@ end
 function (h::PseudoPotentialHamiltonian)(k::Vector)
     nfH(k, h.n, h.pot, h.c)
 end
+
+function Base.ndims(t::PseudoPotentialHamiltonian)
+	t.c |> ndims
+end
