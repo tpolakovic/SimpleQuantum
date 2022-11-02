@@ -18,7 +18,7 @@ end
 grH = TightBindingHamiltonian(grhops)
 
 # Spec up the DOS calculation: Energy in range (-0.5 Ha, 0.5 Ha) with step of 5 mHa and 400x400 grid points.
-grdos = DOS([i * Ha for i ∈ -0.8:0.005:0.8], 400)
+grdos = DOS([i * Ha for i ∈ -0.5:0.005:0.5], 400)
 
 # Solve the problem and plot the DOS.
 grH |> grdos |> solve |> plotSolution
