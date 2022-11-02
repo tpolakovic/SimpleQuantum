@@ -125,15 +125,15 @@ Base.ndims(c::UnitCell{T,N}) where {T,N} = N
 Base.length(c::UnitCell) = c.positions |> length
 
 # crystal
-struct Crystal{N}
-    lattice::Lattice
-    cell::UnitCell
-
 """
     Crystal(L::Lattice, c::UnitCell)
 
 Creates a crystal structure out of unit cell `c` on a Bravais lattice `L`.
 """
+struct Crystal{N}
+    lattice::Lattice
+    cell::UnitCell
+
     function Crystal(l::Lattice{T,N}, c::UnitCell) where {T,N}
         new{N}(l, c)
     end
@@ -183,6 +183,8 @@ function plotcrystal!(ax, c::Crystal, vertpos; ncells, showcell, showbonds, cmap
 
     nothing
 end
+
+Base.ndims(::Crystal{N}) where {N} = N
 
 plotcrystal!(ax, c::Crystal{2}; ncells=1, showcell=true, showbonds=true, cmap=:PuOr_5) =
     plotcrystal!(ax, c, [0 0 1 1 0; 0 1 1 0 0]; ncells, showcell, showbonds, cmap=cmap)

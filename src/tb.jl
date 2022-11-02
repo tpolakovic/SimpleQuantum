@@ -17,6 +17,11 @@ struct Overlap
     offset::Union{<:Real, Array{<:Real}}
 end
 
+"""
+    Hoppings(c::Crystal)
+
+Create an empty hopping list based on crystal structure `c`.
+"""
 mutable struct Hoppings
     c::Crystal
     γs::Array{Hop}
@@ -24,11 +29,6 @@ mutable struct Hoppings
     Ss::Array{Overlap}
     maxij::Int
 
-"""
-    Hoppings(c::Crystal)
-
-Create an empty hopping list based on crystal structure `c`.
-"""
     function Hoppings(c::Crystal)
         new(c, [], [], [], 0)
     end
@@ -114,7 +114,7 @@ end
 
 Tight binding problem definition.
 
-Can be callend on a vector in k-space to output the Hamiltonian.
+Can be called on a vector in k-space to output the Hamiltonian.
 """
 struct TightBindingHamiltonian <: ReciprocalHamiltonian
     hops::Hoppings
@@ -122,4 +122,8 @@ end
 
 function (p::TightBindingHamiltonian)(k)
     tbH(k, p.hops)
+end
+
+function Base.ndims(t::TightBindingHamiltonian)
+	t.hops.c |> ndims
 end

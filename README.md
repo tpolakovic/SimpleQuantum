@@ -29,7 +29,7 @@ grhops = Hoppings(graphene)
 
 # Iterate through unique nearest neighbor pairs and add them to the hopping list.
 for hop ∈ SimpleQuantum.unique_neighbors(graphene)
-    addhop!(grhops, -1.0Ha, hop.i, hop.j, hop.δ)
+    addhop!(grhops, -2.8eV, hop.i, hop.j, hop.δ)
 end
 
 # Define the tight binding Hamiltonian
@@ -48,7 +48,7 @@ grH |> kpath |> solve |> plotSolution
 ```
 Output:
 
-<img src="https://user-images.githubusercontent.com/9288586/196821411-d52fd1a1-5ca1-487a-8295-637948a6b750.png" width=50%>
+<img src="https://user-images.githubusercontent.com/9288586/199577501-a192bdaf-3da7-4186-b749-2c56ef05cc9d.png" width=50%>
 
 ### Nearly free electron model of aluminum:
 
@@ -69,6 +69,7 @@ V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
 # Define the Hamiltonian using the pseudopotential above with reciprocal lattice vectors from up to the 2nd shell
 alH = PseudoPotentialHamiltonian(2, V, Al)
 
+# Define the momentum path.
 kpath = ReciprocalPath([
     :Γ => [0,0,0],
     :X => [1/2,0,1/2],
@@ -82,11 +83,19 @@ kpath = ReciprocalPath([
     :K => [3/8,3/8,3/4]
 ], 0.01)
 
-alH |> kpath |> solve |> plotSolution
+# Solve the problem
+sol = alH |> kpath |> solve
 
-ylims!(current_axis(), (0,10))
+# Find the Fermi energy (3 free electrons in the unit cell of Al).
+ef = sol |> fermilevel(3)
+println("Ef = $ef")
+
+# Plot the band diagram with energy shifted such that E_Fermi = 0.
+sol |> shiftenergy(ef) |> plotSolution
+
+ylims!(current_axis(), (-5,5))
 ```
 
 output:
 
-<img src="https://user-images.githubusercontent.com/9288586/197043712-79040f5c-5b09-48c4-ab62-302871eb418f.png" width=50%>
+<img src="https://user-images.githubusercontent.com/9288586/199576235-f5992bc9-7917-4814-a625-e4286e3dbd3b.png" width=50%>
