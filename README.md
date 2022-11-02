@@ -48,7 +48,7 @@ grH |> kpath |> solve |> plotSolution
 ```
 Output:
 
-<img src="https://user-images.githubusercontent.com/9288586/196821411-d52fd1a1-5ca1-487a-8295-637948a6b750.png" width=50%>
+<img src="https://user-images.githubusercontent.com/9288586/199577501-a192bdaf-3da7-4186-b749-2c56ef05cc9d.png" width=50%>
 
 ### Nearly free electron model of aluminum:
 
