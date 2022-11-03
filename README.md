@@ -1,5 +1,7 @@
 # SimpleQuantum
 
+[![DOI](https://zenodo.org/badge/554441370.svg)](https://zenodo.org/badge/latestdoi/554441370)
+
 A Julia package for calculating properties of crystalline solids. Currently supports tight binding and nearly free electron model calculations on up to 3-dimensional problems.
 
 Read the posts on the [Computational Physics for the Masses series](https://tpolakovic.github.io) for more detailed description of code and algorithms.
