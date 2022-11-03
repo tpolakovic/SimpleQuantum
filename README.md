@@ -44,7 +44,7 @@ kpath = ReciprocalPath([
        ], 0.005)
 
 # Solve and plot the problem.
-grH |> kpath |> solve |> plotSolution
+grH(kpath) |> solve |> plotSolution
 ```
 Output:
 
@@ -84,7 +84,7 @@ kpath = ReciprocalPath([
 ], 0.01)
 
 # Solve the problem
-sol = alH |> kpath |> solve
+sol = alH(kpath) |> solve
 
 # Find the Fermi energy (3 free electrons in the unit cell of Al).
 ef = sol |> fermilevel(3)
