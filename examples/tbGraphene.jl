@@ -113,4 +113,4 @@ kpath = ReciprocalPath([
        ], 0.005)
 
 # Solve and plot the problem.
-grH |> kpath |> solve |> plotSolution
+grH(kpath) |> solve |> plotSolution

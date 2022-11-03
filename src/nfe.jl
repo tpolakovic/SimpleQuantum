@@ -53,8 +53,12 @@ function PseudoPotentialHamiltonian(V::Matrix, c::Crystal)
     PseudoPotentialHamiltonian(V, n, c)
 end
 
-function (h::PseudoPotentialHamiltonian)(k::Vector)
-    nfH(k, h.n, h.pot, h.c)
+# function (h::PseudoPotentialHamiltonian)(k::Vector)
+#     nfH(k, h.n, h.pot, h.c)
+# end
+
+function getH(h::PseudoPotentialHamiltonian)
+    k -> nfH(k, h.n, h.pot, h.c)
 end
 
 function Base.ndims(t::PseudoPotentialHamiltonian)

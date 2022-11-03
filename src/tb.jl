@@ -120,8 +120,12 @@ struct TightBindingHamiltonian <: ReciprocalHamiltonian
     hops::Hoppings
 end
 
-function (p::TightBindingHamiltonian)(k)
-    tbH(k, p.hops)
+# function (p::TightBindingHamiltonian)(k)
+#     tbH(k, p.hops)
+# end
+
+function getH(h::TightBindingHamiltonian)
+    k -> tbH(k, h.hops)
 end
 
 function Base.ndims(t::TightBindingHamiltonian)
