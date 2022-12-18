@@ -21,6 +21,8 @@ struct PseudoPotentialHamiltonian <: ReciprocalHamiltonian
     c::Crystal
 end
 
+# interface
+
 """
      PsuedoPotentialHamiltonian(n::Integer, V::Function, c::Crystal)
 
@@ -56,6 +58,8 @@ end
 # function (h::PseudoPotentialHamiltonian)(k::Vector)
 #     nfH(k, h.n, h.pot, h.c)
 # end
+
+crystal(h::PseudoPotentialHamiltonian) = h.c
 
 function getH(h::PseudoPotentialHamiltonian)
     k -> nfH(k, h.n, h.pot, h.c)

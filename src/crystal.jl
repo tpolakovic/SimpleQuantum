@@ -1,10 +1,10 @@
 # lattice
 struct Lattice{T<:Real, N}
-    R::Union{T, Array{T}}
-    G::Union{T, Array{T}}
+    R::Union{T, AbstractArray{T}}
+    G::Union{T, AbstractArray{T}}
     V::T
 
-    function Lattice(R::Union{<:Real,Matrix{<:Real}})
+    function Lattice(R::Union{<:Real, AbstractMatrix{<:Real}})
         G = 2π * inv(R)
         R,G = promote(R,G)
         V = det(R)
@@ -13,7 +13,7 @@ struct Lattice{T<:Real, N}
     end
 end
 
-function Lattice(R::Union{<:Quantity, Matrix{<:Quantity}})
+function Lattice(R::Union{<:Quantity, AbstractMatrix{<:Quantity}})
     Unitful.NoUnits.(R ./ a₀) |> Lattice
 end
 
@@ -26,8 +26,8 @@ Lattice constants can be dimensionless or dimensionfull using `Unitful` units.
 """
 function Lattice(a::T, b::T, γ::Real) where T <: Union{Real, Quantity}
     γ = deg2rad(γ)
-    R = [a*sin(γ) zero(T);
-         a*cos(γ) b]
+    R = @SMatrix [a*sin(γ) zero(T);
+                  a*cos(γ) b]
 
     Lattice(R)
 end
@@ -43,9 +43,9 @@ function Lattice(a::T, b::T, c::T, α::Real, β::Real, γ::Real) where T <: Unio
     α, β, γ = deg2rad.((α, β, γ))
     γ = (cos(α) * cos(β) - cos(γ)) / (sin(α) * sin(β))
     γ = clamp(γ, -1, 1) |> acos
-    R = [a*sin(β) -b*sin(α)*cos(γ) zero(T);
-         zero(T)  b*sin(α)*sin(γ)  zero(T);
-         a*cos(β) b*cos(α)         c]
+    R = @SMatrix [a*sin(β) -b*sin(α)*cos(γ) zero(T);
+                  zero(T)  b*sin(α)*sin(γ)  zero(T);
+                  a*cos(β) b*cos(α)         c]
 
     Lattice(R)
 end
@@ -54,17 +54,17 @@ Base.ndims(l::Lattice{T,N}) where {T,N} = N
 
 # unit cell
 struct UnitCell{T, N}
-    positions::Vector{T}
-    species::Vector{Symbol}
+    positions::AbstractVector{T}
+    species::AbstractVector{Symbol}
 
 """
-    UnitCell(species::Vector{Symbol}, rs...)
+    UnitCell(species::AbstractVector{Symbol}, rs...)
 
 Construct an crystal unit cell.
 
 # Arguments
-- `species::Vector{Symbol}`: Vector containing site identifiers as symbols. Must be the same length as number of site positions
-- `rs::Union{Vector{T}, T}`: Site positions. Can be vectors or single numbers in 1D cells.
+- `species::AbstractVector{Symbol}`: Vector containing site identifiers as symbols. Must be the same length as number of site positions
+- `rs::Union{AbstractVector{T}, T}`: Site positions. Can be vectors or single numbers in 1D cells.
 
 # Examples
 ```
@@ -72,7 +72,7 @@ UnitCell([:B, :N], [2//3, 1//3], [1//3, 2//3])
 UnitCell{Vector{Rational{Int64}}, 2}(Vector{Rational{Int64}}[[2//3, 1//3], [1//3, 2//3]], [:B, :N])
 ```
 """
-    function UnitCell(species::Vector{Symbol}, rs::T...) where T
+    function UnitCell(species::AbstractVector{Symbol}, rs::T...) where T
         positions = collect(rs)
             if length(species) == length(rs)
                 new{T, length(first(rs))}(positions, species)
@@ -84,13 +84,13 @@ UnitCell{Vector{Rational{Int64}}, 2}(Vector{Rational{Int64}}[[2//3, 1//3], [1//3
 end
 
 """
-    UnitCell(species::Vector{Symbol}, rs...)
+    UnitCell(species::AbstractVector{Symbol}, rs...)
 
 Construct an crystal unit cell.
 
 # Arguments
 - `species::Symbol`: Site identifier as symbol. All sites will have this identifier.
-- `rs::Union{Vector{T}, T}`: Site positions. Can be vectors or single numbers in 1D cells.
+- `rs::Union{AbstractVector{T}, T}`: Site positions. Can be vectors or single numbers in 1D cells.
 
 # Examples
 ```
@@ -109,7 +109,7 @@ end
 Construct an crystal unit cell. Sites will have a generic label `:none`
 
 # Arguments
-- `rs::Union{Vector{T}, T}`: Site positions. Can be vectors or single numbers in 1D cells.
+- `rs::Union{AbstractVector{T}, T}`: Site positions. Can be vectors or single numbers in 1D cells.
 
 # Examples
 ```
@@ -193,3 +193,113 @@ plotcrystal!(ax, c::Crystal{3}; ncells=1, showcell=true, showbonds=true, cmap=:P
     [0 1 1 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1;
      0 0 1 1 0 0 1 1 0 0 0 1 1 0 0 1 1 0 0;
      0 0 0 0 0 1 1 0 0 0 1 1 0 0 1 1 1 1 1]; ncells, showcell, showbonds, cmap=cmap)
+
+function mpspace(q)
+    [(2r - q - 1)/2q for r ∈ 1:q]
+end
+
+"""
+    getPG(c::Crystal)
+
+Calculates the point symmetry group operations of `c`.
+"""
+function getPG(c::Crystal)
+    D = ndims(c)
+    # TODO: I think Minkowski reduction might be good here.
+    R = c.lattice.R |> Matrix
+    iR = SMatrix{D,D}(inv(R))
+    norms = mapslices(norm, R; dims=1)
+    vol = c.lattice.V
+    ls = round.(norms) .+ 1
+    verts = (Iterators.product(ntuple(i -> -ls[i]:ls[i], D)...)
+             .|> collect
+              |> x -> reshape(x, :, 1)
+              |> combinedims)[:,:,1]
+    out = SMatrix{D,D}[]
+    for perm ∈ permutations(1:size(verts, 2), D)
+        vs = R * verts[:, perm]
+        _norms = mapslices(norm, vs; dims=1)
+        _vol = abs(det(vs))
+        if all(norms ≈ _norms) & all(vol ≈ _vol)
+            op = SMatrix{D,D}(vs * iR)
+            if all(op' * op ≈ I)
+                append!(out, [op])
+            end
+        end
+    end
+    out
+end
+
+"""
+    _maptoibz(ks, c::Crystal[, pg]; kwargs)
+
+Finds irreducible momentum vectors of collection `ks`.
+"""
+function _maptoibz end
+
+function _maptoibz(ks, c::Crystal, pg; kwargs...)
+    D = ndims(c)
+    out = SVector{D}[]
+    for k ∈ ks
+        k = SVector{D}(k)
+        mks = map(m -> m * k, pg)
+        isin = false
+        for mk ∈ mks
+            if isapproxin(mk, out)
+                isin = true
+                break
+            end
+        end
+        if !isin
+            push!(out, k)
+        end
+    end
+    out
+end
+
+function _maptoibz(ks, c::Crystal; kwargs...)
+    _maptoibz(ks, c, getPG(c))
+end
+
+"""
+    ibzωk(c::Crystal, q::Integer[, pg])
+
+Momentum vectors in irreducible Brillouin zone of `c`.
+
+A regular grid with `q` points along each axis is reduced to IBZ by application of
+point symmetry operations `pg` and multiplicieties of irreducible vector set are calculated.
+
+# Returns
+- `Tuple(Array{Int}, Array{SVector})`: Multiplicities and positions of irreducible grid points.
+"""
+function ibzωk end
+
+function ibzωk(c::Crystal, q::Integer, pg)
+    n = ndims(c)
+    ks = Iterators.product(ntuple(_ -> mpspace(q), n)...)
+    ks = _maptoibz(ks, c)
+    ωs = map(ks) do k
+        map(p -> p * k, pg) |> approxunique |> length
+    end
+    (ωs, ks)
+end
+
+function ibzωk(c::Crystal, q::Integer)
+    ibzωk(c::Crystal, q::Int, getPG(c))
+end
+
+"""
+    ∫bz(f::Function, c::Crystal, q::Int[, ωks])
+
+Evaluates integral of `f` within Brillouin zone on a grid of `q` points along each axis.
+"""
+function ∫bz end
+
+function ∫bz(f::Function, c::Crystal, q::Int, ωks)
+    ωs, ks = ωks
+    mapreduce(x -> x[2] * f(x[1]), +, zip(eachcol(ks), ωs)) / length(ks)
+end
+
+function ∫bz(f::Function, c::Crystal, q::Int)
+    ∫bz(f::Function, c::Crystal, q::Int, ibzωk(c, q))
+end
