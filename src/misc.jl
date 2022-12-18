@@ -47,6 +47,29 @@ function dedup_floats(itr)
     out
 end
 
+function approxunique(itr; kwargs...)
+    out = Vector{eltype(itr)}()
+    push!(out, itr[1])
+    for itrel ∈ itr
+        if map(x -> !isapprox(itrel, x; kwargs...), out) |> all
+            push!(out, itrel)
+        end
+    end
+    out
+end
+
+"""
+    isapproxin(el, itr; kwargs)
+
+Determines whether `el` is in iterable collection `itr` as determined by `isapprox`.
+"""
+function isapproxin(el, itr; kwargs...)
+    for i ∈ itr
+        isapprox(el, i; kwargs...) && return true
+    end
+    false
+end
+
 """
     unique_neighbors(c::Crystal)
 

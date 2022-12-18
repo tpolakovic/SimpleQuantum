@@ -4,10 +4,12 @@ using LinearAlgebra
 using Unitful
 import Unitful: Å, eV
 using RangeHelpers: range, around
-using Match
+using StaticArrays
+using SplitApplyCombine
 using Colors
 using GLMakie
 using Accessors
+using Combinatorics
 
 include("crystal.jl")
 include("interface.jl")
@@ -20,27 +22,13 @@ include("misc.jl")
 a₀ = 1.889726125Å
 Ha = 27.2eV
 
-export a₀,
-    Ha,
-    Å,
-    eV,
-    Lattice,
-    UnitCell,
-    Crystal,
-    plotcrystal!,
-    fermilevel,
-    shiftenergy,
-    evals,
-    evecs,
-    kvecs,
-    solve,
-    ReciprocalPath,
-    plotSolution,
-    DOS,
-    Hoppings,
-    addhop!,
-    addonsite!,
-    addoverlap!,
-    TightBindingHamiltonian,
-    PseudoPotentialHamiltonian
+export a₀, Ha, Å, eV
+export Lattice, UnitCell, Crystal
+export shiftenergy, fermilevel
+export plotcrystal!
+export evals, evecs, kvecs
+export solve, plotSolution
+export ReciprocalPath, DOS
+export Hoppings, addhop!, addonsite!, addoverlap!
+export TightBindingHamiltonian, PseudoPotentialHamiltonian
 end

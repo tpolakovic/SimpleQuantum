@@ -2,7 +2,7 @@ struct Hop
     γ::Number
     i::Int
     j::Int
-    offset::Union{<:Real, Array{<:Real}}
+    offset::Union{<:Real, AbstractArray{<:Real}}
 end
 
 struct Onsite
@@ -14,7 +14,7 @@ struct Overlap
     S::Number
     i::Int
     j::Int
-    offset::Union{<:Real, Array{<:Real}}
+    offset::Union{<:Real, AbstractArray{<:Real}}
 end
 
 """
@@ -24,9 +24,9 @@ Create an empty hopping list based on crystal structure `c`.
 """
 mutable struct Hoppings
     c::Crystal
-    γs::Array{Hop}
-    μs::Array{Onsite}
-    Ss::Array{Overlap}
+    γs::AbstractArray{Hop}
+    μs::AbstractArray{Onsite}
+    Ss::AbstractArray{Overlap}
     maxij::Int
 
     function Hoppings(c::Crystal)
@@ -81,8 +81,8 @@ end
 
 function tbH(k, hops::Hoppings)
     n = hops.maxij
-    ham = zeros(Complex,n,n)
-    Smat = zeros(ComplexF64,n,n)
+    ham = zeros(ComplexF32,n,n)
+    Smat = zeros(ComplexF32,n,n)
 
     for hop ∈ hops.γs
         i, j = hop.i, hop.j
@@ -105,6 +105,8 @@ function tbH(k, hops::Hoppings)
         Smat[j,i] += conj(S)
     end
     Smat += diagm(ones(n))
+    ham = Hermitian(ham)
+    Smat = Hermitian(Smat)
     (ham, Smat)
 end
 
@@ -119,6 +121,8 @@ Can be called on a vector in k-space to output the Hamiltonian.
 struct TightBindingHamiltonian <: ReciprocalHamiltonian
     hops::Hoppings
 end
+
+crystal(h::TightBindingHamiltonian) = h.hops.c
 
 # function (p::TightBindingHamiltonian)(k)
 #     tbH(k, p.hops)

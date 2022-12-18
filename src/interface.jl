@@ -140,7 +140,7 @@ end
 Finds the Fermi level with `n` electrons in the unit cell.
 """
 function fermilevel(n)
-	EFermi(n)
+    EFermi(n)
 end
 
 """
@@ -149,17 +149,17 @@ end
 Rigidly shifts the energy axis by `shift`.
 """
 function shiftenergy(shift)
-	s -> @set s.evals = [e .- shift for e ∈ evals(s)]
+    s -> @set s.evals = [e .- shift for e ∈ evals(s)]
 end
 
 function shiftenergy(shift::T) where T <: Quantity
-	shift = Unitful.NoUnits(shift ./ Ha)
-	shiftenergy(shift)
+    shift = Unitful.NoUnits(shift ./ Ha)
+    shiftenergy(shift)
 end
 
 struct ReciprocalDOSProblem
-	h
-	dos
+    h
+    dos
 end
 
 """
@@ -200,24 +200,25 @@ end
 struct DOSSolution
     es
     evals
+    ks
+    ωs
     nks
     broadening
 end
 
 function (d::DOSSolution)(E)
     ϵ = d.broadening
-    (1/(π * d.nks)) * map(d.evals) do ens
-        map(ens) do En
-            ϵ / ((E - En)^2 + ϵ^2)
-        end |> sum
-    end |> sum
+    out = 0.0
+
+    for (ω, ens) ∈ zip(d.ωs, d.evals)
+        for En ∈ ens
+            out +=  ω * ϵ / ((E - En)^2 + ϵ^2)
+        end
+    end
+     (1/(π * d.nks)) * out
 end
 
 evals(s::DOSSolution) = s.evals
-
-function mpspace(q)
-	[(2r - q - 1)/2q for r ∈ 1:q]
-end
 
 """
     solve(dp::ReciprocalDOSProblem)
@@ -226,12 +227,13 @@ Calculates the density of states as defined in `dp`.
 """
 function solve(dp::ReciprocalDOSProblem)
     h = dp.h
+    c = crystal(h)
     dos = dp.dos
     q = dos.nq
     ϵ = dp.dos.broadening
     n = ndims(h)
-    ks = reshape(Iterators.product(ntuple(_ -> mpspace(q), n)...) |> collect, 1, :)
-    nks = length(ks)
+    ωs, ks = ibzωk(c, q)
+    nks = length(ωs)
     hs = h.(ks)
 
     if typeof(first(hs)) <: Tuple
@@ -240,7 +242,7 @@ function solve(dp::ReciprocalDOSProblem)
         es = map(h -> eigen(h).values, hs)
     end
 
-    DOSSolution(dos.es, es, nks, ϵ)
+    DOSSolution(dos.es, es, ks, ωs, nks, ϵ)
 end
 
 """
