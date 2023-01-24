@@ -1,24 +1,24 @@
+######################################################################################
+abstract type GenericHamiltonian end
+
+# function Base.ndims(t::T) where {T <: GenericHamiltonian}
+#     error(typeof(t), " needs to have `ndims` defined.")
+# end
+
+function getH(t::T) where {T <: GenericHamiltonian}
+    error(typeof(t), " needs to have `getH` defined.")
+end
+
+abstract type ReciprocalHamiltonian <: GenericHamiltonian end
+
+function (h::ReciprocalHamiltonian)(k)
+    getH(h)(k)
+end
+
 struct ReciprocalPath
     ks::Vector{Union{<:Real, Vector{<:Real}}}
     kp::Vector{<:Real}
     kl::Vector{Pair{Symbol, <:Real}}
-end
-
-abstract type ReciprocalHamiltonian end
-
-function Base.ndims(t::T) where {T <: ReciprocalHamiltonian}
-    e = typeof(t)
-    throw(ArgumentError("$e needs to have `ndims` defined."))
-end
-
-function getH(t::T) where {T <: ReciprocalHamiltonian}
-    e = typeof(t)
-    throw(ArgumentError("$e needs to have `getH` defined."))
-end
-
-struct ReciprocalBandProblem
-    h::ReciprocalHamiltonian
-    kp::ReciprocalPath
 end
 
 function ReciprocalPath(kpositions::Vector, kstep::Real)
@@ -26,19 +26,18 @@ function ReciprocalPath(kpositions::Vector, kstep::Real)
     ReciprocalPath(k.path, k.plength, k.ppoints)
 end
 
-function (h::ReciprocalHamiltonian)(k)
-    getH(h)(k)
-end
-
-function (rp::ReciprocalPath)(h::ReciprocalHamiltonian)
-    ReciprocalBandProblem(h, rp)
+struct ReciprocalBandProblem
+    h::ReciprocalHamiltonian
+    kp::ReciprocalPath
 end
 
 function (h::ReciprocalHamiltonian)(rp::ReciprocalPath)
     ReciprocalBandProblem(h, rp)
 end
 
-# abstract type Solution end
+function (rp::ReciprocalPath)(h::ReciprocalHamiltonian)
+    ReciprocalBandProblem(h, rp)
+end
 
 """
     BandSolution

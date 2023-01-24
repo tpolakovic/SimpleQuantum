@@ -10,6 +10,7 @@ using Colors
 using GLMakie
 using Accessors
 using Combinatorics
+using SymmetryReduceBZ
 
 include("crystal.jl")
 include("interface.jl")
