@@ -204,30 +204,7 @@ end
 Calculates the point symmetry group operations of `c`.
 """
 function getPG(c::Crystal)
-    D = ndims(c)
-    # TODO: I think Minkowski reduction might be good here.
-    R = c.lattice.R |> Matrix
-    iR = SMatrix{D,D}(inv(R))
-    norms = mapslices(norm, R; dims=1)
-    vol = c.lattice.V
-    ls = round.(norms) .+ 1
-    verts = (Iterators.product(ntuple(i -> -ls[i]:ls[i], D)...)
-             .|> collect
-              |> x -> reshape(x, :, 1)
-              |> combinedims)[:,:,1]
-    out = SMatrix{D,D}[]
-    for perm ∈ permutations(1:size(verts, 2), D)
-        vs = R * verts[:, perm]
-        _norms = mapslices(norm, vs; dims=1)
-        _vol = abs(det(vs))
-        if all(norms ≈ _norms) & all(vol ≈ _vol)
-            op = SMatrix{D,D}(vs * iR)
-            if all(op' * op ≈ I)
-                append!(out, [op])
-            end
-        end
-    end
-    out
+    SymmetryReduceBZ.Symmetry.calc_pointgroup(c.lattice.R)
 end
 
 """
