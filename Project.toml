@@ -1,7 +1,7 @@
 name = "SimpleQuantum"
 uuid = "7c07e4e5-e402-48af-840a-a11b8ea3e28c"
 authors = ["Tomas Polakovic <tom.polakovic@gmail.com> and contributors"]
-version = "0.2.4"
+version = "0.2.5"
 
 [deps]
 Accessors = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
@@ -11,10 +11,10 @@ GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 Match = "7eb4fadd-790c-5f42-8a69-bfa0b872bfbf"
+MinkowskiReduction = "d617d09d-b3c0-43f1-8886-30d89b900f25"
 RangeHelpers = "3a07dd3d-1c52-4395-8858-40c6328157db"
 SplitApplyCombine = "03a91e81-4c3e-53e1-a0a4-9c0c8f19dd66"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
-SymmetryReduceBZ = "49a35663-c880-4242-bebb-1ec8c0fa8046"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
