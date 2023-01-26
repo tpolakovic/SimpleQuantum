@@ -198,13 +198,46 @@ function mpspace(q)
     [(2r - q - 1)/2q for r ∈ 1:q]
 end
 
+function reduced_basis(c::Crystal{2})
+    vs = GaussReduce((eachcol(c.lattice.R))...)
+    hcat(vs...)
+end
+
+function reduced_basis(c::Crystal{3})
+    vs = minkReduce((eachcol(c.lattice.R))...)
+    length(vs) > 3 && return hcat(vs[1:3]...)
+    hcat(vs...)
+end
+
 """
     getPG(c::Crystal)
 
 Calculates the point symmetry group operations of `c`.
 """
 function getPG(c::Crystal)
-    SymmetryReduceBZ.Symmetry.calc_pointgroup(c.lattice.R)
+    R = reduced_basis(c) |> Matrix
+    D = ndims(c)
+    iR = inv(R)
+    norms = mapslices(norm, R; dims=1)
+    vol = c.lattice.V
+    ls = round.(norms)
+    verts = (Iterators.product(ntuple(i -> -ls[i]:ls[i], D)...)
+        .|> collect
+         |> x -> reshape(x, :, 1)
+         |> combinedims)[:,:,1]
+    out = SMatrix{D,D}[]
+    for perm ∈ permutations(1:size(verts, 2), D)
+            vs = R * verts[:, perm]
+            _norms = mapslices(norm, vs; dims=1)
+            _vol = abs(det(vs))
+            if all(norms ≈ _norms) & all(vol ≈ _vol)
+                op = SMatrix{D,D}(vs * iR)
+                if all(op' * op ≈ I)
+                    append!(out, [op])
+                end
+            end
+        end
+    out
 end
 
 """
