@@ -237,7 +237,7 @@ function getPG(c::Crystal)
                 end
             end
         end
-        out
+    out
 end
 
 """
