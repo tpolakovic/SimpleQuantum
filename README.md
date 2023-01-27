@@ -14,14 +14,6 @@ In Julia REPL, press `]` to enter pkg mode and enter:
 pkg> add https://github.com/tpolakovic/SimpleQuantum
 ```
 
-:exclamation: There's currently a bug in one of the dependencies if you're using an M1 Mac. As a workaround, install the master version first:
-
-```
-pkg> add SymmetryReduceBZ#master
-pkg> add https://github.com/tpolakovic/SimpleQuantum
-```
-
-
 ## Sample
 
 ### Tight binding model of two-band graphene:
