@@ -20,7 +20,7 @@ include("misc.jl")
 
 # Unit definitons
 
-a₀ = 1.889726125Å
+a₀ = 0.529177249Å
 Ha = 27.2eV
 
 export a₀, Ha, Å, eV
