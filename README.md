@@ -67,7 +67,7 @@ Al = Crystal(
 )
 
 # Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 3.
-V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 3^2))
+V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 10^2))
 
 # Define the Hamiltonian using the pseudopotential above with reciprocal lattice vectors from up to the 2nd shell
 alH = PseudoPotentialHamiltonian(2, V, Al)
@@ -96,9 +96,9 @@ println("Ef = $ef")
 # Plot the band diagram with energy shifted such that E_Fermi = 0.
 sol |> shiftenergy(ef) |> plotSolution
 
-ylims!(current_axis(), (-5,5))
+ylims!(current_axis(), (-0.2,0.4))
 ```
 
 output:
 
-<img src="https://user-images.githubusercontent.com/9288586/199576235-f5992bc9-7917-4814-a625-e4286e3dbd3b.png" width=50%>
+<img src="https://user-images.githubusercontent.com/9288586/225970346-c0e4b431-137c-4b7a-8d5a-459bbf216cdc.png" width=50%>
