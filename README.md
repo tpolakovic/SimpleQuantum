@@ -66,7 +66,7 @@ Al = Crystal(
     UnitCell(:Al, [0.0, 0.0, 0.0])
 )
 
-# Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 3.
+# Momentum representation of a Thomas-Fermi potential with charge of Q = 3 and screening length |q| = 10.
 V(k) = ifelse(norm(k) ≈ 0, 0, 4π * 3/(norm(k)^2 .+ 10^2))
 
 # Define the Hamiltonian using the pseudopotential above with reciprocal lattice vectors from up to the 2nd shell
